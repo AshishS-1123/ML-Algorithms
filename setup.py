@@ -25,7 +25,7 @@ setup(
     author = "Ashish Shevale",
     author_email = "shevaleashish@gmail.com",
     packages = [ 'ML_Algo.Preprocessing' ],
-    ext_modules = [PrePro_MinMax_Extension,PrePro_Std_Extension],
+    ext_modules = ext_modules,
     include_dirs = [np.get_include()]
     
 )
