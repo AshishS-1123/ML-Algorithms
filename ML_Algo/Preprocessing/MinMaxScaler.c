@@ -5,14 +5,14 @@
 // Global Variables
 
 // variable to hold the minimum value the transformed data should have
-int range_min = 0;
+float range_min = 0;
 // variable to hold the maximum value the transformed data should have
-int range_max = 1;
+float range_max = 1;
 
 // variable to hold the smallest element in the data
-int min_x = 1e5;
+float min_x = 1e5;
 // variable to hold the largest element in the data
-int max_x = 0;
+float max_x = 0;
 
 // Functions
 
@@ -27,7 +27,7 @@ Return Value : None ( Python Object )
 PyObject* min_max_scaler(PyObject* self, PyObject* args)
 {
     // Parse the passed arguments and store the results in range_min and range_max variables
-    if( ! PyArg_ParseTuple( args, "ii", &range_min, &range_max ) )
+    if( ! PyArg_ParseTuple( args, "ff", &range_min, &range_max ) )
         return NULL;
 
     // Return the None Python Object
@@ -63,7 +63,7 @@ PyObject* fit(PyObject* self, PyObject* args )
     
     // Get the number of rows in the data
     int rows = (int) PyArray_SHAPE( input_array )[0];
-    
+
     // Get the pointer to the data inside the numpy array
     float* data = (float*) PyArray_DATA( input_array );
     
@@ -80,7 +80,7 @@ PyObject* fit(PyObject* self, PyObject* args )
             // that element will be out maximum
             max_x = data[ i ];
     }
-    
+
     // Return the None Python Object
     return Py_None;
 }
