@@ -138,46 +138,90 @@ PyObject* transform(PyObject* self, PyObject* args )
 /*
 Function : fit_transform
 In Python : fit_transform
-
+Description : Fits and Transforms the data in the same step
+Parameters : input_array - Numpy Array containing the data to be transformed
+Return Value : Python Numpy Array Object containing the transformed data
 */
 PyObject* fit_transform(PyObject* self, PyObject* args )
 {
+    // Create an empty Numy array object to hold the input array
     PyArrayObject* input_array = NULL;
     
+    // Parse the arguments to get the numpy array containing the data
     if( !PyArg_ParseTuple( args, "O", &input_array ) )
         return NULL;
     
+    // Cast the input_array to dtype float so the function can now be used for all data types
     input_array = (PyArrayObject*) PyArray_Cast(input_array, NPY_FLOAT);
     
+    // Get the number of dimensions in the input array
     int n_dims = PyArray_NDIM( input_array );
     
+    // If the input_array contains more than 1 column, set an exception
     if( n_dims != 1 )
         PyErr_SetString( PyExc_ValueError, "MinMaxScaler currently supports single column data only." );
-        
+    
+    // Get the number of rows in the data
     int rows = (int) PyArray_SHAPE( input_array )[0];
     
+    // Get a C pointer to data in the numpy array object
     float* data = (float*) PyArray_DATA( input_array );
     
+    // Repeat the following fo every element to get the min and max values in the data
     for( int i = 0; i < rows; ++i )
     {
+        // If the current element of the array is less than the min value
         if( data[ i ] < min_x )
+            // Set the current element as the new min value
             min_x = data[ i ];
             
+        // If the current element of the array is larger than the max value
         if( data[ i ] > max_x )
+            // Set the current element as the new max value
             max_x = data[ i ];
     }
     
+    // Create a new pointer to hold the tranformed data and assign space to it
     float* out_data = (float*) malloc( rows * sizeof(float) );
     
+    // Repeat the following for all elements of data and transform it according to the formula
     for( int i = 0; i < rows; ++i )
     {
+        // Calculate the new value for the i'th element as per the formula
         out_data[ i ] = ( ( range_max - range_min ) * ( data[ i ] - min_x ) ) / ( max_x - min_x ) + range_min;
     }
     
+    // Create a Numpy Array Object that contains the transformed data
     PyArrayObject* output = (PyArrayObject*) PyArray_SimpleNewFromData(1, PyArray_DIMS( input_array ), NPY_FLOAT, (void*) out_data);
     
+    // Return the Array Object
     return PyArray_Return( output );
-    
+}
+
+/*
+Function : get_min
+In Python : get_min
+Description : Returns the minimum value from the data, used as a parameter for transforming the data
+Parameters : None
+Return Value : The smallest value in the input array
+*/
+PyObject* get_min( PyObject* self )
+{
+    // Convert the min value to python object and return it
+    return Py_BuildValue("f", min_x);
+}
+
+/*
+Function : get_max
+In Python : get_max
+Description : Returns the maximum value from the data, used as a parameter for transforming the data
+Parameters : None
+Return Value : The largest value in the input array
+*/
+PyObject* get_max( PyObject* self )
+{
+    // Convert the max value to python object and return it
+    return Py_BuildValue("f", max_x);
 }
 
 //########        MODULE LEVEL FUNCTIONS        ########
@@ -188,6 +232,8 @@ static PyMethodDef methods[] = {
   { "fit", fit, METH_VARARGS, "Fits the MinMaxScaler on the data given to it"},
   { "transform", transform, METH_VARARGS, "Transforms the data as per the MinMaxScaler formula"},
   {"fit_transform", fit_transform, METH_VARARGS, "Fits and Transforms the data at the same time"},
+  {"get_min", (PyCFunction)get_min, METH_NOARGS, "Getter function for Minimum value in data"},
+  {"get_max", (PyCFunction)get_max, METH_NOARGS, "Getter function for Maximum value in data"},
   { NULL, NULL, 0, NULL }
 };
 
