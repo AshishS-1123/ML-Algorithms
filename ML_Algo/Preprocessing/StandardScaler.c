@@ -164,6 +164,32 @@ PyObject* fit_transform( PyObject* self, PyObject* args )
     return PyArray_Return( output );
 }
 
+/*
+Function : get_mean
+In Python : get_mean
+Description : Returns the mean of the data, used as a parameter for transforming the data
+Parameters : None
+Return Value : The mean of all elements in input array
+*/
+PyObject* get_mean( PyObject* self )
+{
+    // Convert the min value to python object and return it
+    return Py_BuildValue("f", data_mean);
+}
+
+/*
+Function : get_std
+In Python : get_std
+Description : Returns the standard deviation of data, used as a parameter for transforming
+Parameters : None
+Return Value : The standard deviation of the input array
+*/
+PyObject* get_std( PyObject* self )
+{
+    // Convert the max value to python object and return it
+    return Py_BuildValue("f", data_std);
+}
+
 //########        MODULE LEVEL FUNCTIONS        ########
 
 // method definitions
@@ -171,6 +197,8 @@ static PyMethodDef methods[] = {
   { "fit", fit, METH_VARARGS, "Fits the StandardScaler on the data given to it"},
   { "transform", transform, METH_VARARGS, "Transforms the data as per the StandardScaler formula"},
   {"fit_transform", fit_transform, METH_VARARGS, "Fits the Standard Scaler and then transform the data as per the Standard Scaler formula"},
+  {"get_mean", (PyCFunction)get_mean, METH_NOARGS, "Getter function for mean of data"},
+  {"get_std", (PyCFunction)get_std, METH_NOARGS, "Getter function for standard deviation data"},
   { NULL, NULL, 0, NULL }
 };
 
