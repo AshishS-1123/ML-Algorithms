@@ -4,8 +4,8 @@
 #include<math.h>
 
 // Global Variables
-int data_mean = 0;
-int data_std = 0;
+float data_mean = 0;
+float data_std = 0;
 
 // Functions
 
