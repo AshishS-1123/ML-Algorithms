@@ -17,14 +17,14 @@ float max_x = 0;
 // Functions
 
 /*
-Function : min_max_scaler
+Function : set_range
 In Python : set_range
 Description : Set the variables for minimum values the transformed data is allowed to have
 Parameters : range_min - the smallest value the transformed data is allowed to have
                         range_max - the largest value the transfprmed data is allowed to have
 Return Value : None ( Python Object )
 */
-PyObject* min_max_scaler(PyObject* self, PyObject* args)
+PyObject* set_range(PyObject* self, PyObject* args)
 {
     // Parse the passed arguments and store the results in range_min and range_max variables
     if( ! PyArg_ParseTuple( args, "ff", &range_min, &range_max ) )
@@ -66,6 +66,9 @@ PyObject* fit(PyObject* self, PyObject* args )
 
     // Get the pointer to the data inside the numpy array
     float* data = (float*) PyArray_DATA( input_array );
+    
+    // Reset the min_x and max_x values to avoid logical errors when training on new data
+    min_x = 1e5, max_x = 0;
     
     // Loop through every element in data, and look for the minimum and maximum values in it
     for( int i = 0; i < rows; ++i )
@@ -167,6 +170,9 @@ PyObject* fit_transform(PyObject* self, PyObject* args )
     // Get a C pointer to data in the numpy array object
     float* data = (float*) PyArray_DATA( input_array );
     
+    // Reset the min_x and max_x values to avoid logical errors when training on new data
+    min_x = 1e5, max_x = 0;
+    
     // Repeat the following fo every element to get the min and max values in the data
     for( int i = 0; i < rows; ++i )
     {
@@ -228,7 +234,7 @@ PyObject* get_max( PyObject* self )
 
 // method definitions
 static PyMethodDef methods[] = {
-  {"set_range", min_max_scaler, METH_VARARGS, "Sets the range between which the transformed values should appear"},
+  {"set_range", set_range, METH_VARARGS, "Sets the range between which the transformed values should appear"},
   { "fit", fit, METH_VARARGS, "Fits the MinMaxScaler on the data given to it"},
   { "transform", transform, METH_VARARGS, "Transforms the data as per the MinMaxScaler formula"},
   {"fit_transform", fit_transform, METH_VARARGS, "Fits and Transforms the data at the same time"},
